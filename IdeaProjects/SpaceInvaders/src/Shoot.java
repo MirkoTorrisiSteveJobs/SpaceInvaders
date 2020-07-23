@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Shoot extends Thread{
     private int[] coords;
     private boolean enemy;
@@ -7,17 +9,36 @@ public class Shoot extends Thread{
         this.coords = coords;
     }
 
-    public int[] getCoords() {
-        return coords;
-    }
-    public void fire() throws InterruptedException {
-        while (this.coords[1] >0 || !hitSomething) {
-                sleep(100);
+    @Override
+    public void run() {
+        while (this.coords[1] >1 && !hitSomething && this.coords[1] <=19) {
+            try {
+                sleep(320);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if(!enemy) {
                 this.coords[1]--;
+            }
+            else {
+                this.coords[1]++;
             }
         }
     }
-    public void hasHitSomething() {
+
+    public boolean isEnemy() {
+        return enemy;
+    }
+
+    public int[] getCoords() {
+        return coords;
+    }
+
+    public boolean isHitSomething() {
+        return hitSomething;
+    }
+
+    public void setHitSomething() {
         this.hitSomething = true;
     }
 }
