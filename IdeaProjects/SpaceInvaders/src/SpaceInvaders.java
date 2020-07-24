@@ -42,13 +42,12 @@ public class SpaceInvaders extends Thread{
     }
     private void randomEnemyShot(){
         for(EnemyShip enemyShip:enemies){
-            if(Math.random() <0.00009 && !enemyShip.isHit()){
+            if(Math.random() <0.00029 && !enemyShip.isHit()){
                 Shoot shoot = new Shoot(true, enemyShip.getPosition());
                 SpaceInvaders.shootsContainer.add(shoot);
                 shoot.start();
             }
         }
-
     }
     public void playerShot(){
         Shoot shoot = new Shoot(false, this.player.getPosition());
@@ -65,7 +64,6 @@ public class SpaceInvaders extends Thread{
         if(count == enemies.size()){
             System.out.println("hai vinto");
         }
-        System.out.println(count);
     }
     private void checkGameOver(){
         if(!player.isInGame()){
@@ -124,7 +122,7 @@ public class SpaceInvaders extends Thread{
 
         while (iter.hasNext()) {
             Shoot shoot = iter.next();
-            if (shoot.getCoords()[1] <2 || shoot.getCoords()[1] >19)
+            if (shoot.getCoords()[1] <2 || shoot.getCoords()[1] >19 )
                 iter.remove();
         }
     }
@@ -133,19 +131,19 @@ public class SpaceInvaders extends Thread{
         switch (level){
             case 1:
                 for (int j = 5; j < 15; j++) {
-                        enemies.add(new EnemyShip("tipe1", new int[]{j, 1}));
+                        enemies.add(new EnemyShip(1, new int[]{j, 1}));
                 }
                 for (int j = 5; j < 15; j++) {
-                        enemies.add(new EnemyShip("tipe2", new int[]{j, 2}));
+                        enemies.add(new EnemyShip(2, new int[]{j, 2}));
                 }
                 for (int j = 5; j < 15; j++) {
-                        enemies.add(new EnemyShip("tipe2", new int[]{j, 3}));
+                        enemies.add(new EnemyShip(2, new int[]{j, 3}));
                 }
                 for (int j = 5; j < 15; j++) {
-                        enemies.add(new EnemyShip("tipe3", new int[]{j, 4}));
+                        enemies.add(new EnemyShip(3, new int[]{j, 4}));
                 }
                 for (int j = 5; j < 15; j++) {
-                        enemies.add(new EnemyShip("tipe3", new int[]{j, 5}));
+                        enemies.add(new EnemyShip(3, new int[]{j, 5}));
                 }
                 break;
         }
