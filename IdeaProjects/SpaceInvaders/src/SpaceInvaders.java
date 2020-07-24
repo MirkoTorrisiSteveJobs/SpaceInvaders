@@ -4,12 +4,12 @@ import java.util.Iterator;
 public class SpaceInvaders extends Thread{
     private int score;
     private int level;
-    static ArrayList<Shoot> shootsContainer = new ArrayList<>();
     private boolean gameOver;
-    private ArrayList<int[]> shieldCoords = new ArrayList<>();
-    private int[][] grid = new int[20][20];
-    private PlayerShip player = new PlayerShip();
+    static ArrayList<Shoot> shootsContainer = new ArrayList<>();
+    private ArrayList<Shield> shieldCoords = new ArrayList<>();
     private ArrayList<EnemyShip> enemies = new ArrayList<>();
+    private PlayerShip player = new PlayerShip();
+    private int[][] grid = new int[20][20];
     public SpaceInvaders(){
         loadEnemies(1);
         loadShields();
@@ -34,6 +34,7 @@ public class SpaceInvaders extends Thread{
     */
     protected void makeOneFrame(){
         checkGameOver();
+        checkWin();
         checkShoots();
         removeShots();
         randomEnemyShot();
@@ -41,8 +42,7 @@ public class SpaceInvaders extends Thread{
     }
     private void randomEnemyShot(){
         for(EnemyShip enemyShip:enemies){
-            if(Math.random() <0.000009){
-                System.out.println("nemico spara");
+            if(Math.random() <0.00009 && !enemyShip.isHit()){
                 Shoot shoot = new Shoot(true, enemyShip.getPosition());
                 SpaceInvaders.shootsContainer.add(shoot);
                 shoot.start();
@@ -55,9 +55,24 @@ public class SpaceInvaders extends Thread{
         SpaceInvaders.shootsContainer.add(shoot);
         shoot.start();
     }
-    private void checkGameOver(){
+    private void checkWin(){
+        int count = 0;
         for(EnemyShip ship:enemies){
-            if(ship.isLanded()){
+            if(ship.isHit()){
+                count++;
+            }
+        }
+        if(count == enemies.size()){
+            System.out.println("hai vinto");
+        }
+        System.out.println(count);
+    }
+    private void checkGameOver(){
+        if(!player.isInGame()){
+            gameOver=true;
+        }
+        for(EnemyShip ship:enemies){
+            if(ship.isLanded() && !ship.isHit()){
                 System.out.println("eh sono atterrati");
                 gameOver = true;
             }
@@ -65,9 +80,9 @@ public class SpaceInvaders extends Thread{
     }
     private void loadShields(){
         for (int i = 1; i < 17; i+=5) {
-            shieldCoords.add(new int[]{i,18});
-            shieldCoords.add(new int[]{i+1,18});
-            shieldCoords.add(new int[]{i+2,18});
+            shieldCoords.add(new Shield(new int[]{i,18}));
+            shieldCoords.add(new Shield(new int[]{i+1,18}));
+            shieldCoords.add(new Shield(new int[]{i+2,18}));
         }
     }
 
@@ -76,7 +91,6 @@ public class SpaceInvaders extends Thread{
             if(shoot.isEnemy()) {
                 if (shoot.getCoords()[0] == player.getPosition()[0] && shoot.getCoords()[1] == player.getPosition()[1]) {
                     player.die();
-                    System.out.println("TI HANNO PRESO");
                     shoot.setHitSomething();
                 }
             }
@@ -87,21 +101,34 @@ public class SpaceInvaders extends Thread{
                     EnemyShip enemyShip = iter.next();
                     if(!shoot.isHitSomething() && shoot.getCoords()[0] == enemyShip.getPosition()[0] && shoot.getCoords()[1] == enemyShip.getPosition()[1] && !enemyShip.isHit()) {
                         enemyShip.hasBeenHit();
+                        this.score+=10;
                         shoot.setHitSomething();
                     }
                 }
 
             }
-            Iterator<int[]> iter = shieldCoords.iterator();
+            Iterator<Shield> iter = shieldCoords.iterator();
             while (iter.hasNext()) {
-                int[] coords = iter.next();
-                if(shoot.getCoords()[0] == coords[0] && shoot.getCoords()[1] == coords[1]) {
-                    iter.remove();
+                Shield shield = iter.next();
+                if(!shield.isHit() && shoot.getCoords()[0] == shield.getCoords()[0] && shoot.getCoords()[1] == shield.getCoords()[1]) {
+                    shield.hasBeenHit();
+                    this.score-=10;
                     shoot.setHitSomething();
                 }
             }
         }
     }
+
+    private void removeShots(){
+        Iterator<Shoot> iter = shootsContainer.iterator();
+
+        while (iter.hasNext()) {
+            Shoot shoot = iter.next();
+            if (shoot.getCoords()[1] <2 || shoot.getCoords()[1] >19)
+                iter.remove();
+        }
+    }
+
     private void loadEnemies(int level){
         switch (level){
             case 1:
@@ -122,7 +149,8 @@ public class SpaceInvaders extends Thread{
                 }
                 break;
         }
-    }/*
+    }
+    /*
     private void removeEnemies(EnemyShip enemyShipToRemove){
         Iterator<EnemyShip> iter = enemies.iterator();
 
@@ -132,16 +160,10 @@ public class SpaceInvaders extends Thread{
                 iter.remove();
         }
         System.out.println("nemico rimosso");
-    }*/
-    private void removeShots(){
-        Iterator<Shoot> iter = shootsContainer.iterator();
+    }
+    */
 
-        while (iter.hasNext()) {
-            Shoot shoot = iter.next();
-            if (shoot.getCoords()[1] <2 || shoot.getCoords()[1] >19 || shoot.isHitSomething())
-                iter.remove();
-        }
-    }/*
+    /*
     private void gridElements(){
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
@@ -159,8 +181,8 @@ public class SpaceInvaders extends Thread{
         }
         grid[player.getPosition()[0]][player.getPosition()[1]] = 4;
 
-    }*/
-
+    }
+    */
     public PlayerShip getPlayer() {
         return player;
     }
@@ -173,7 +195,7 @@ public class SpaceInvaders extends Thread{
         return level;
     }
 
-    public ArrayList<int[]> getShieldCoords() {
+    public ArrayList<Shield> getShieldCoords() {
         return shieldCoords;
     }
 

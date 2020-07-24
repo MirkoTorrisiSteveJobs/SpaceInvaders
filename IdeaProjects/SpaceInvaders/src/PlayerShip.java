@@ -31,7 +31,8 @@ public class PlayerShip extends Thread{
     public void run(){
         try {
             while (inGame) {
-                sleep(160);
+                checkGameOver();
+                sleep(80);
                 if (moveLeft) {
                     this.position--;
                 } else if (moveRight) {
@@ -48,6 +49,7 @@ public class PlayerShip extends Thread{
     }
     private void checkGameOver(){
         if(this.lives == 0){
+            System.out.println("sei morto");
             inGame = false;
         }
     }

@@ -9,6 +9,8 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -41,48 +43,57 @@ public class GameViewManager extends Application {
         Group root = new Group();
         pane = new AnchorPane();
         createBackground();
-
         pane.getChildren().add(root);
         Scene scene = new Scene(pane, GAME_WIDTH, GAME_HEIGTH);
 
         Circle playerShip = new Circle(20);
-
         root.getChildren().addAll(playerShip);
+
         for (EnemyShip ship : game.getEnemies()) {
             Circle circle = new Circle(10);
             root.getChildren().addAll(circle);
             enemyCircles.add(circle);
         }
 
+        for (Shield shield : game.getShieldCoords()) {
+            Rectangle rect = new Rectangle(20, 20);
+            rect.setX(shield.getCoords()[0]*25);
+            rect.setY(shield.getCoords()[1]*25);
+            shieldSquares.add(rect);
+            root.getChildren().addAll(rect);
+        }
+        Text score = new Text();
+        score.setX(100);
+        score.setY(10);
+        score.setStyle("-fx-font-size:15px;");
+        root.getChildren().add(score);
+
         final Box keyboardNode = new Box();
         keyboardNode.setFocusTraversable(true);
         keyboardNode.requestFocus();
-
         keyboardNode.setOnKeyPressed(this::handle); // call to the EventHandler
-
         root.getChildren().add(keyboardNode);
+
         stage.setScene(scene);
         stage.show();
+
         AnimationTimer animator = new AnimationTimer() {
 
             @Override
             public void handle(long arg0) {
                 game.makeOneFrame();
+                score.setText("SCORE: "+String.valueOf(game.getScore()));
                 if(game.getPlayer().isInGame() && !game.isGameOver()){
+                    playerShip.setCenterX(game.getPlayer().getPosition()[0]*25+25);
+                    playerShip.setCenterY(game.getPlayer().getPosition()[1]*25+25);
+
                     if(isShooting && game.getShoots().size() > 0){
                         Rectangle rect = new Rectangle(5,20);
-                        //rect.setId(rect.getX()+"-"+rect.getY());
                         shootRectContainer.add(rect);
                         root.getChildren().add(rect);
                         isShooting = false;
                     }
 
-                    for (int[] shield : game.getShieldCoords()) {
-                        Rectangle rect = new Rectangle(20, 20);
-                        rect.setX(shield[0]*25);
-                        rect.setY(shield[1]*25);
-                        root.getChildren().addAll(rect);
-                    }
                     for(int i = 0 ; i < shootRectContainer.size(); i++){
                         if(game.getShoots().size()>i) {
                             shootRectContainer.get(i).setX(game.getShoots().get(i).getCoords()[0] * 25);
@@ -91,13 +102,15 @@ public class GameViewManager extends Application {
                                 root.getChildren().remove(shootRectContainer.get(i));
                             }
                         }
-
                     }
-                    playerShip.setCenterX(game.getPlayer().getPosition()[0]*25+25);
-                    playerShip.setCenterY(game.getPlayer().getPosition()[1]*25+25);
+                    for (int i = 0; i < game.getShieldCoords().size(); i++) {
+                        if(game.getShieldCoords().get(i).isHit()){
+                            root.getChildren().remove(shieldSquares.get(i));
+                        }
+                    }
+
                     for (int i = 0; i < enemyCircles.size(); i++) {
                         if(game.getEnemies().get(i).isHit()) {
-
                             root.getChildren().remove(enemyCircles.get(i));
                         }
                         else{
@@ -127,6 +140,9 @@ public class GameViewManager extends Application {
         {
             game.getPlayer().move(-1);
         }
+    }
+    private Text scoreGen(){
+        return new Text(String.valueOf(game.getScore()));
     }
     private String createFilePath(String path){
         String finalPath = new File("").getAbsolutePath();

@@ -15,21 +15,21 @@ public class EnemyShip extends Thread {
             if (firsTime) {
                 for (int i = 0; i < 5; i++) {
                     this.position[0]--;
-                    sleep(800);
+                    sleep(640);
                 }
                 firsTime = false;
             }
-            while(!hasLanded) {
+            while(!hasLanded && !hit) {
                 checkIfLanded();
                 this.position[1]++;
                 for (int i = 0; i < 10; i++) {
                     this.position[0]++;
-                    sleep(800);
+                    sleep(640);
                 }
                 this.position[1]++;
                 for (int i = 0; i < 10; i++) {
                     this.position[0]--;
-                    sleep(800);
+                    sleep(640);
                 }
 
             }

@@ -13,7 +13,7 @@ public class Shoot extends Thread{
     public void run() {
         while (this.coords[1] >1 && !hitSomething && this.coords[1] <=19) {
             try {
-                sleep(320);
+                sleep(160);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
