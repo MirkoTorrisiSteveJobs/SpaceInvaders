@@ -4,15 +4,15 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.media.AudioClip;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Box;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class GameViewManager extends Application {
-    private boolean isShooting;
     private AnchorPane pane;
     SpaceInvaders game = new SpaceInvaders();
 
@@ -35,26 +34,19 @@ public class GameViewManager extends Application {
     Canvas canvas = new Canvas(GAME_WIDTH, GAME_HEIGTH);
     GraphicsContext gc = canvas.getGraphicsContext2D();
 
-    private GridPane pane1 = new GridPane();
-    private GridPane pane2 = new GridPane();
-    private GridPane pane3 = new GridPane();
-
-    private final String BG_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\bg\\16 Bit Space Background Astronaut scott kelly is coming home - cnn.com.jpg";
     private final String PLAYER_SHIP_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\player\\kisspng-sprite-space-shuttle-story-spacecraft-2d-computer-space-craft-5ab949f7a10741-removebg-preview.png";
     private final String ENEMY_SHIP_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\enemy\\enemy_scontornati\\enemy1.png";
     private final String ENEMY_SHIP2_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\enemy\\enemy_scontornati\\enemy2.png";
     private final String ENEMY_SHIP3_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\enemy\\enemy_scontornati\\enemy3.png";
     private final String SHOOT_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\shoot\\red-laser-png - removebg-preview.png";
     private final String EXPLOSION_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\explosion\\explosion.png";
-    private final String AUDIO_SHOOT_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\AUDIO\\explosion\\esm_8bit_explosion_heavy_with_voice_bomb_boom_blast_cannon_retro_old_school_classic_cartoon.mp3";
-    private final String AUDIO_EXPLOSION_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\AUDIO\\shoot\\laser1.mp3";
 
-    Image playerShip = new Image(new File(createFilePath(PLAYER_SHIP_PATH)).getAbsoluteFile().toURI().toString(), 20, 20, false, false);
-    Image shootImage = new Image(new File(createFilePath(SHOOT_PATH)).getAbsoluteFile().toURI().toString(), 2, 10, false, false);
-    Image explosionImage = new Image(new File(createFilePath(EXPLOSION_PATH)).getAbsoluteFile().toURI().toString(), 10, 20, false, false);
-    Image enemyImage1 = new Image(new File(createFilePath(ENEMY_SHIP_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
-    Image enemyImage2 = new Image(new File(createFilePath(ENEMY_SHIP2_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
-    Image enemyImage3 = new Image(new File(createFilePath(ENEMY_SHIP3_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
+    private Image playerShip = new Image(new File(createFilePath(PLAYER_SHIP_PATH)).getAbsoluteFile().toURI().toString(), 20, 20, false, false);
+    private Image shootImage = new Image(new File(createFilePath(SHOOT_PATH)).getAbsoluteFile().toURI().toString(), 2, 10, false, false);
+    private Image explosionImage = new Image(new File(createFilePath(EXPLOSION_PATH)).getAbsoluteFile().toURI().toString(), 10, 20, false, false);
+    private Image enemyImage1 = new Image(new File(createFilePath(ENEMY_SHIP_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
+    private Image enemyImage2 = new Image(new File(createFilePath(ENEMY_SHIP2_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
+    private Image enemyImage3 = new Image(new File(createFilePath(ENEMY_SHIP3_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
 
     public static void Main(String[] args){
         launch(args);
@@ -94,22 +86,16 @@ public class GameViewManager extends Application {
             else{
                 gc.drawImage(explosionImage, shoot.getCoords()[0] * multiplier, shoot.getCoords()[1] * multiplier);
             }
-
         }
     }
-    private void createAudioClips(){
-        AudioClip shoot = new AudioClip(new File(createFilePath(AUDIO_SHOOT_PATH)).toURI().toString());
-        AudioClip explosion = new AudioClip(new File(createFilePath(AUDIO_EXPLOSION_PATH)).toURI().toString());
 
-    }
     private Scene createContent(Stage stage) {
         Group root = new Group();
         pane = new AnchorPane();
-        createBackground();
+        MediaMaker.createBackground(pane, GAME_HEIGTH);
         pane.getChildren().add(root);
-        root.getChildren().add(canvas);
-        Scene scene = new Scene(pane, GAME_WIDTH, GAME_HEIGTH);
-
+        MediaPlayer player = MediaMaker.playSong();
+        player.play();
         for (Shield shield : game.getShieldCoords()) {
             Rectangle rect = new Rectangle(20, 20);
             rect.setX(shield.getCoords()[0]*25);
@@ -118,11 +104,6 @@ public class GameViewManager extends Application {
             shieldSquares.add(rect);
             root.getChildren().addAll(rect);
         }
-        Text score = new Text();
-        score.setX(100);
-        score.setY(10);
-        score.setStyle("-fx-font-size:15px;");
-        root.getChildren().add(score);
 
         final Box keyboardNode = new Box();
         keyboardNode.setFocusTraversable(true);
@@ -130,16 +111,30 @@ public class GameViewManager extends Application {
         keyboardNode.setOnKeyPressed(this::handle); // call to the EventHandler
         root.getChildren().add(keyboardNode);
 
-        stage.setScene(scene);
-        stage.show();
-
         AnimationTimer animator = new AnimationTimer() {
 
             @Override
             public void handle(long arg0) {
+
                 gc.clearRect(0, 0, GAME_WIDTH,GAME_HEIGTH);
-                moveBackground();
-                score.setText("SCORE: "+String.valueOf(game.getScore()));
+                MediaMaker.moveBackground(GAME_HEIGTH);
+                if(game.isLevelWin()){
+                    gc.setFont(Font.font(50));
+                    gc.fillText("LEVEL " + game.getLevel(), 200, 200);
+                    gc.strokeText("LEVEL: " + game.getLevel(), 200, 200);
+                    gc.setFill(Color.RED);
+                    try {
+                        Thread.sleep(100);
+                        gc.setFill(Color.WHITE);
+                    }
+                    catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                }
+                gc.setFont(Font.font(20));
+                gc.fillText("SCORE: " + game.getScore(), 300, 20);
+                gc.strokeText("SCORE: " + game.getScore(), 300, 20);
+                gc.setFill(Color.WHITE);
                 if(game.getPlayer().isInGame() && !game.isGameOver()){
                     animatePlayer();
                     animateEnemies();
@@ -149,31 +144,44 @@ public class GameViewManager extends Application {
                             root.getChildren().remove(shieldSquares.get(i));
                         }
                     }
-
-
                     game.makeOneFrame();
-
+                }
+                else {
+                    gc.setFont(Font.font(50));
+                    gc.setFill(Color.RED);
+                    gc.fillText("GAME OVER", 200, 200);
                 }
             }
 
         };
+        canvas.setMouseTransparent(true);
+        root.getChildren().add(canvas);
         animator.start();
+        Pane scrollPane = new Pane(pane);
+        BorderPane borderPane = new BorderPane();
+        borderPane.setMinHeight(GAME_HEIGTH+20);
+        borderPane.setTop(menu(stage));
+        borderPane.setCenter(scrollPane);
+        Scene scene = new Scene(borderPane, GAME_WIDTH, GAME_HEIGTH);
+        stage.setScene(scene);
+        stage.show();
         return scene;
     }
     private void handle(KeyEvent arg0) {
-        if (arg0.getCode() == KeyCode.SPACE )
-        {
-            game.playerShot();
-            isShooting = true;
+        if(!game.isLevelWin()) {
+            if (arg0.getCode() == KeyCode.SPACE) {
+                game.playerShot();
+                MediaMaker.playShoot();
+            } else if (arg0.getCode() == KeyCode.LEFT) {
+                game.getPlayer().move(1);
+            } else if (arg0.getCode() == KeyCode.RIGHT) {
+                game.getPlayer().move(-1);
+            }
         }
-
-        else if (arg0.getCode() == KeyCode.LEFT )
-        {
-            game.getPlayer().move(1);
-        }
-        else if (arg0.getCode() == KeyCode.RIGHT )
-        {
-            game.getPlayer().move(-1);
+        else{
+            if(arg0.getCode() == KeyCode.SPACE || arg0.getCode() == KeyCode.RIGHT || arg0.getCode() == KeyCode.LEFT){
+                game.setLevelWin(false);
+            }
         }
     }
     private Text scoreGen(){
@@ -183,27 +191,29 @@ public class GameViewManager extends Application {
         String finalPath = new File("").getAbsolutePath();
         return finalPath + path;
     }
-    private void createBackground() {
-        File file = new File(createFilePath(BG_PATH));
-        javafx.scene.image.Image img = new Image(file.getAbsoluteFile().toURI().toString());
+    private VBox menu(Stage stage){
+        final Menu menu1 = new Menu("Options");
+        MenuItem menuItem1 = new MenuItem("Restart");
+        MenuItem menuItem2 = new MenuItem("Go to main menu");
+        menuItem1.setOnAction(e -> {
+            game = new SpaceInvaders();
+        });
+        menuItem2.setOnAction(e -> {
+            MainMenu menu = new MainMenu();
+            try {
+                menu.start(stage);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        });
 
-        pane1.getChildren().add(new ImageView(img));
-        pane2.getChildren().add(new ImageView(img));
-        pane3.getChildren().add(new ImageView(img));
-        pane.getChildren().addAll(pane1,pane2,pane3);
-        pane3.setLayoutY(GAME_HEIGTH-5);
-        pane2.setLayoutY(GAME_HEIGTH-5);
-    }
-    private void moveBackground(){
-        pane1.setLayoutY(pane1.getLayoutY()-4.5);
-        pane2.setLayoutY(pane2.getLayoutY()-4.5);
-        pane3.setLayoutY(pane3.getLayoutY()-4.5);
-        if(pane1.getLayoutY() <= -GAME_HEIGTH+5){
-            pane1.setLayoutY(GAME_HEIGTH-5);
-        }
-        if(pane2.getLayoutY() <= -GAME_HEIGTH+5){
-            pane2.setLayoutY(GAME_HEIGTH-5);
-        }
+        menu1.getItems().add(menuItem2);
+        menu1.getItems().add(menuItem1);
 
+        MenuBar menuBar = new MenuBar();
+        menuBar.getMenus().addAll(menu1);
+
+        return new VBox(menuBar);
     }
+
 }

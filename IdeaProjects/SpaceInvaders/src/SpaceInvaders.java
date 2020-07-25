@@ -1,23 +1,24 @@
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SpaceInvaders extends Thread{
     private int score;
-    private int level;
+    private int level = 1;
     private boolean gameOver;
+    private boolean levelWin;
     static ArrayList<Shoot> shootsContainer = new ArrayList<>();
     private ArrayList<Shield> shieldCoords = new ArrayList<>();
     private ArrayList<EnemyShip> enemies = new ArrayList<>();
     private PlayerShip player = new PlayerShip();
     private int[][] grid = new int[20][20];
     public SpaceInvaders(){
-        loadEnemies(1);
         loadShields();
+        loadEnemies(1);
+
         //gridElements();
         this.player.start();
-        for(EnemyShip ship: enemies){
-            ship.start();
-        }
+
     }
 
     /*
@@ -42,7 +43,7 @@ public class SpaceInvaders extends Thread{
     }
     private void randomEnemyShot(){
         for(EnemyShip enemyShip:enemies){
-            if(Math.random() <0.00029 && !enemyShip.isHit()){
+            if(Math.random() <0.00001*this.level  && !enemyShip.isHit()){
                 Shoot shoot = new Shoot(true, enemyShip.getPosition());
                 SpaceInvaders.shootsContainer.add(shoot);
                 shoot.start();
@@ -61,8 +62,11 @@ public class SpaceInvaders extends Thread{
                 count++;
             }
         }
-        if(count == enemies.size()){
+        if(count == enemies.size() || score>level*250){
             System.out.println("hai vinto");
+            this.level++;
+            levelWin = true;
+            loadEnemies(this.level);
         }
     }
     private void checkGameOver(){
@@ -100,6 +104,7 @@ public class SpaceInvaders extends Thread{
                     if(!shoot.isHitSomething() && shoot.getCoords()[0] == enemyShip.getPosition()[0] && shoot.getCoords()[1] == enemyShip.getPosition()[1] && !enemyShip.isHit()) {
                         enemyShip.hasBeenHit();
                         this.score+=10;
+                        MediaMaker.playExplosion();
                         shoot.setHitSomething();
                     }
                 }
@@ -111,6 +116,7 @@ public class SpaceInvaders extends Thread{
                 if(!shield.isHit() && shoot.getCoords()[0] == shield.getCoords()[0] && shoot.getCoords()[1] == shield.getCoords()[1]) {
                     shield.hasBeenHit();
                     this.score-=10;
+                    MediaMaker.playExplosion();
                     shoot.setHitSomething();
                 }
             }
@@ -128,25 +134,20 @@ public class SpaceInvaders extends Thread{
     }
 
     private void loadEnemies(int level){
-        switch (level){
-            case 1:
-                for (int j = 5; j < 15; j++) {
-                        enemies.add(new EnemyShip(1, new int[]{j, 1}));
-                }
-                for (int j = 5; j < 15; j++) {
-                        enemies.add(new EnemyShip(2, new int[]{j, 2}));
-                }
-                for (int j = 5; j < 15; j++) {
-                        enemies.add(new EnemyShip(2, new int[]{j, 3}));
-                }
-                for (int j = 5; j < 15; j++) {
-                        enemies.add(new EnemyShip(3, new int[]{j, 4}));
-                }
-                for (int j = 5; j < 15; j++) {
-                        enemies.add(new EnemyShip(3, new int[]{j, 5}));
-                }
-                break;
+        for(int i = 1; i < level+5;i++) {
+            for (int j = 5; j < 15; j++) {
+                EnemyShip ship = new EnemyShip(ThreadLocalRandom.current().nextInt(1, 3 + 1), new int[]{j, i});
+                ship.start();
+                enemies.add(ship);
+            }
         }
+    }
+
+    public boolean isLevelWin() {
+        return levelWin;
+    }
+    public void setLevelWin(boolean levelWin){
+        this.levelWin = levelWin;
     }
     /*
     private void removeEnemies(EnemyShip enemyShipToRemove){

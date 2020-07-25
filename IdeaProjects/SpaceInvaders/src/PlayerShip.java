@@ -33,9 +33,9 @@ public class PlayerShip extends Thread{
             while (inGame) {
                 checkGameOver();
                 sleep(80);
-                if (moveLeft) {
+                if (moveLeft && this.position>0) {
                     this.position--;
-                } else if (moveRight) {
+                } else if (moveRight&& this.position<19) {
                     this.position++;
                 }
             }
