@@ -1,7 +1,7 @@
-import java.util.ArrayList;
+
 
 public class Shoot extends Thread{
-    private int[] coords;
+    private final int[] coords;
     private boolean enemy;
     private boolean hitSomething;
     public Shoot(boolean enemy, int[] coords){
@@ -12,15 +12,20 @@ public class Shoot extends Thread{
     @Override
     public void run() {
         while (this.coords[1] >-1 && this.coords[1] <21) {
-            try {
-                sleep(160);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             if(!enemy) {
+                try {
+                    sleep(60);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 this.coords[1]--;
             }
             else {
+                try {
+                    sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 this.coords[1]++;
             }
         }

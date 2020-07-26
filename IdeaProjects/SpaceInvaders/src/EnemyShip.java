@@ -4,6 +4,7 @@ public class EnemyShip extends Thread {
     private boolean hit;
     private boolean firsTime = true;
     private boolean hasLanded;
+    private boolean isShooting;
     public EnemyShip(int type, int[] position){
         this.type = type;
         this.position = position;
