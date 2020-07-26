@@ -1,7 +1,3 @@
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
 public class PlayerShip extends Thread{
     private int position = 4;
     private boolean moveLeft;
@@ -49,7 +45,6 @@ public class PlayerShip extends Thread{
     }
     private void checkGameOver(){
         if(this.lives == 0){
-            System.out.println("sei morto");
             inGame = false;
         }
     }

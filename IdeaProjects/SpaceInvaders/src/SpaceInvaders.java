@@ -5,41 +5,25 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SpaceInvaders extends Thread{
     private int score;
     private int level = 1;
+    private String playerName;
     private boolean gameOver;
-    private boolean levelWin;
     static ArrayList<Shoot> shootsContainer = new ArrayList<>();
     private ArrayList<Shield> shieldCoords = new ArrayList<>();
     private ArrayList<EnemyShip> enemies = new ArrayList<>();
     private PlayerShip player = new PlayerShip();
-    private int[][] grid = new int[20][20];
-    public SpaceInvaders(){
+    public SpaceInvaders(String playerName){
         loadShields();
         loadEnemies(1);
-
-        //gridElements();
         this.player.start();
-
+        this.playerName = playerName;
     }
 
-    /*
-    @Override
-    public void run(){
-        try {
-                makeOneFrame();
-                Thread.sleep(800);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-    */
     protected void makeOneFrame(){
         checkGameOver();
         checkWin();
         checkShoots();
         removeShots();
         randomEnemyShot();
-        //gridElements();
     }
     private void randomEnemyShot(){
         for(EnemyShip enemyShip:enemies){
@@ -62,10 +46,8 @@ public class SpaceInvaders extends Thread{
                 count++;
             }
         }
-        if(count == enemies.size() || score>level*250){
-            System.out.println("hai vinto");
+        if(count == enemies.size() || score>level*300){
             this.level++;
-            levelWin = true;
             loadEnemies(this.level);
         }
     }
@@ -75,7 +57,6 @@ public class SpaceInvaders extends Thread{
         }
         for(EnemyShip ship:enemies){
             if(ship.isLanded() && !ship.isHit()){
-                System.out.println("eh sono atterrati");
                 gameOver = true;
             }
         }
@@ -143,45 +124,6 @@ public class SpaceInvaders extends Thread{
         }
     }
 
-    public boolean isLevelWin() {
-        return levelWin;
-    }
-    public void setLevelWin(boolean levelWin){
-        this.levelWin = levelWin;
-    }
-    /*
-    private void removeEnemies(EnemyShip enemyShipToRemove){
-        Iterator<EnemyShip> iter = enemies.iterator();
-
-        while (iter.hasNext()) {
-            EnemyShip enemyShip = iter.next();
-            if (enemyShip.equals(enemyShipToRemove));
-                iter.remove();
-        }
-        System.out.println("nemico rimosso");
-    }
-    */
-
-    /*
-    private void gridElements(){
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                grid[i][j] = 0;
-            }
-        }
-        for (EnemyShip ship:enemies) {
-            grid[ship.getPosition()[0]][ship.getPosition()[1]] = 1;
-            }
-        for (int[] shield:shieldCoords) {
-            grid[shield[0]][shield[1]] = 2;
-            }
-        for(Shoot shoot:shootsContainer){
-            grid[shoot.getCoords()[0]][shoot.getCoords()[1]] = 3;
-        }
-        grid[player.getPosition()[0]][player.getPosition()[1]] = 4;
-
-    }
-    */
     public PlayerShip getPlayer() {
         return player;
     }
@@ -198,10 +140,6 @@ public class SpaceInvaders extends Thread{
         return shieldCoords;
     }
 
-    public int[][] getGrid() {
-        return grid;
-    }
-
     public ArrayList<EnemyShip> getEnemies() {
         return enemies;
     }
@@ -214,28 +152,4 @@ public class SpaceInvaders extends Thread{
         return gameOver;
     }
 
-    public String toString(){
-        String  result = "";
-        for (int i = 0; i < grid.length; i++) {
-            result+="\n";
-            for (int j = 0; j < grid[i].length; j++) {
-                if(grid[j][i] == 1){
-                    result+="S";
-                }
-                else if(grid[j][i] == 2){
-                    result+="w";
-                }
-                else if(grid[j][i] == 3){
-                    result+="|";
-                }
-                else if(grid[j][i] == 4){
-                    result+="^";
-                }
-                else{
-                    result+="-";
-                }
-            }
-        }
-        return result;
-    }
 }

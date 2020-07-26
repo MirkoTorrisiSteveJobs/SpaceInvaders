@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[]args){
-        SpaceInvaders gsame = new SpaceInvaders();
+        SpaceInvaders gsame = new SpaceInvaders("savono");
         gsame.start();
         while (!gsame.isGameOver()) {
             Scanner scan = new Scanner(System.in);

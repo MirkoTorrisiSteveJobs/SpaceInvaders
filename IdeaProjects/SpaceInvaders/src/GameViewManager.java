@@ -4,32 +4,28 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Box;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.ArrayList;
 
 public class GameViewManager extends Application {
-    private AnchorPane pane;
-    SpaceInvaders game = new SpaceInvaders();
 
-    private ArrayList<Rectangle> shieldSquares = new ArrayList<>();
+    SpaceInvaders game;
+    String playerName;
+    private AnchorPane pane;
+
 
     private final int multiplier = 25;
-    private final int GAME_HEIGTH = game.getGrid().length * multiplier;
-    private final int GAME_WIDTH = game.getGrid()[0].length * multiplier;
+    private final int GAME_HEIGTH = 20 * multiplier;
+    private final int GAME_WIDTH = 20 * multiplier;
 
     Canvas canvas = new Canvas(GAME_WIDTH, GAME_HEIGTH);
     GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -40,18 +36,28 @@ public class GameViewManager extends Application {
     private final String ENEMY_SHIP3_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\enemy\\enemy_scontornati\\enemy3.png";
     private final String SHOOT_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\shoot\\red-laser-png - removebg-preview.png";
     private final String EXPLOSION_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\explosion\\explosion.png";
+    private final String SHIELD_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\shield\\scudo1.png";
 
-    private Image playerShip = new Image(new File(createFilePath(PLAYER_SHIP_PATH)).getAbsoluteFile().toURI().toString(), 20, 20, false, false);
-    private Image shootImage = new Image(new File(createFilePath(SHOOT_PATH)).getAbsoluteFile().toURI().toString(), 2, 10, false, false);
-    private Image explosionImage = new Image(new File(createFilePath(EXPLOSION_PATH)).getAbsoluteFile().toURI().toString(), 10, 20, false, false);
-    private Image enemyImage1 = new Image(new File(createFilePath(ENEMY_SHIP_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
-    private Image enemyImage2 = new Image(new File(createFilePath(ENEMY_SHIP2_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
-    private Image enemyImage3 = new Image(new File(createFilePath(ENEMY_SHIP3_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
+    private final String SCORES_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\scores.txt";
+
+    private Image playerShip = new Image(new File(MediaMaker.createFilePath(PLAYER_SHIP_PATH)).getAbsoluteFile().toURI().toString(), 20, 20, false, false);
+    private Image shootImage = new Image(new File(MediaMaker.createFilePath(SHOOT_PATH)).getAbsoluteFile().toURI().toString(), 2, 10, false, false);
+    private Image explosionImage = new Image(new File(MediaMaker.createFilePath(EXPLOSION_PATH)).getAbsoluteFile().toURI().toString(), 10, 20, false, false);
+    private Image enemyImage1 = new Image(new File(MediaMaker.createFilePath(ENEMY_SHIP_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
+    private Image enemyImage2 = new Image(new File(MediaMaker.createFilePath(ENEMY_SHIP2_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
+    private Image enemyImage3 = new Image(new File(MediaMaker.createFilePath(ENEMY_SHIP3_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
+    private Image shieldImage = new Image(new File(MediaMaker.createFilePath(SHIELD_PATH)).getAbsoluteFile().toURI().toString(), 10, 10, false, false);
 
     public static void Main(String[] args){
         launch(args);
     }
 
+    public GameViewManager(String playerName){
+        game = new SpaceInvaders(playerName);
+        this.playerName = playerName;
+        MediaMaker.playSong();
+
+    }
     @Override
     public void start(Stage stage) throws Exception {
         stage.setTitle("SpaceInvaders");
@@ -88,29 +94,28 @@ public class GameViewManager extends Application {
             }
         }
     }
+    private void animateShields(){
+        for (Shield shield : game.getShieldCoords()) {
+            if (!shield.isHit()) {
+                gc.drawImage(shieldImage, shield.getCoords()[0] * multiplier, shield.getCoords()[1] * multiplier);
+            }
+        }
+    }
 
     private Scene createContent(Stage stage) {
+        MediaPlayer player = MediaMaker.playSong();
+        player.play();
         Group root = new Group();
         pane = new AnchorPane();
         MediaMaker.createBackground(pane, GAME_HEIGTH);
         pane.getChildren().add(root);
-        MediaPlayer player = MediaMaker.playSong();
-        player.play();
-        for (Shield shield : game.getShieldCoords()) {
-            Rectangle rect = new Rectangle(20, 20);
-            rect.setX(shield.getCoords()[0]*25);
-            rect.setY(shield.getCoords()[1]*25);
-            rect.setFill(Color.BLUEVIOLET);
-            shieldSquares.add(rect);
-            root.getChildren().addAll(rect);
-        }
 
         final Box keyboardNode = new Box();
         keyboardNode.setFocusTraversable(true);
         keyboardNode.requestFocus();
         keyboardNode.setOnKeyPressed(this::handle); // call to the EventHandler
         root.getChildren().add(keyboardNode);
-
+        final boolean[] justOnce = {true};
         AnimationTimer animator = new AnimationTimer() {
 
             @Override
@@ -118,57 +123,43 @@ public class GameViewManager extends Application {
 
                 gc.clearRect(0, 0, GAME_WIDTH,GAME_HEIGTH);
                 MediaMaker.moveBackground(GAME_HEIGTH);
-                if(game.isLevelWin()){
-                    gc.setFont(Font.font(50));
-                    gc.fillText("LEVEL " + game.getLevel(), 200, 200);
-                    gc.strokeText("LEVEL: " + game.getLevel(), 200, 200);
-                    gc.setFill(Color.RED);
-                    try {
-                        Thread.sleep(100);
-                        gc.setFill(Color.WHITE);
-                    }
-                    catch (InterruptedException e){
-                        e.printStackTrace();
-                    }
-                }
+
                 gc.setFont(Font.font(20));
                 gc.fillText("SCORE: " + game.getScore(), 300, 20);
                 gc.strokeText("SCORE: " + game.getScore(), 300, 20);
                 gc.setFill(Color.WHITE);
+                gc.fillText("LEVEL " + game.getLevel(), 10, 20);
                 if(game.getPlayer().isInGame() && !game.isGameOver()){
                     animatePlayer();
                     animateEnemies();
                     animateShoots();
-                    for (int i = 0; i < game.getShieldCoords().size(); i++) {
-                        if(game.getShieldCoords().get(i).isHit()){
-                            root.getChildren().remove(shieldSquares.get(i));
-                        }
-                    }
+                    animateShields();
                     game.makeOneFrame();
                 }
-                else {
+                else{
                     gc.setFont(Font.font(50));
                     gc.setFill(Color.RED);
                     gc.fillText("GAME OVER", 200, 200);
+                    gc.setFont(Font.font(20));
+                    gc.setFill(Color.WHITE);
+                    if(justOnce[0]) {
+                        CSV.writeAppend(MediaMaker.createFilePath(SCORES_PATH), "\n" + playerName + "," + game.getScore());
+                        justOnce[0] = false;
+                    }
+                    gc.fillText("press ENTER to play again", 200, 250);
                 }
             }
-
         };
-        canvas.setMouseTransparent(true);
         root.getChildren().add(canvas);
         animator.start();
-        Pane scrollPane = new Pane(pane);
-        BorderPane borderPane = new BorderPane();
-        borderPane.setMinHeight(GAME_HEIGTH+20);
-        borderPane.setTop(menu(stage));
-        borderPane.setCenter(scrollPane);
-        Scene scene = new Scene(borderPane, GAME_WIDTH, GAME_HEIGTH);
+        Pane paneCont = new Pane(pane);
+        Scene scene = new Scene(paneCont, GAME_WIDTH, GAME_HEIGTH);
         stage.setScene(scene);
         stage.show();
         return scene;
     }
     private void handle(KeyEvent arg0) {
-        if(!game.isLevelWin()) {
+        if(!game.isGameOver()) {
             if (arg0.getCode() == KeyCode.SPACE) {
                 game.playerShot();
                 MediaMaker.playShoot();
@@ -179,41 +170,11 @@ public class GameViewManager extends Application {
             }
         }
         else{
-            if(arg0.getCode() == KeyCode.SPACE || arg0.getCode() == KeyCode.RIGHT || arg0.getCode() == KeyCode.LEFT){
-                game.setLevelWin(false);
+            if(arg0.getCode() == KeyCode.ENTER){
+                game = new SpaceInvaders(this.playerName);
             }
         }
     }
-    private Text scoreGen(){
-        return new Text(String.valueOf(game.getScore()));
-    }
-    private String createFilePath(String path){
-        String finalPath = new File("").getAbsolutePath();
-        return finalPath + path;
-    }
-    private VBox menu(Stage stage){
-        final Menu menu1 = new Menu("Options");
-        MenuItem menuItem1 = new MenuItem("Restart");
-        MenuItem menuItem2 = new MenuItem("Go to main menu");
-        menuItem1.setOnAction(e -> {
-            game = new SpaceInvaders();
-        });
-        menuItem2.setOnAction(e -> {
-            MainMenu menu = new MainMenu();
-            try {
-                menu.start(stage);
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-        });
 
-        menu1.getItems().add(menuItem2);
-        menu1.getItems().add(menuItem1);
-
-        MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().addAll(menu1);
-
-        return new VBox(menuBar);
-    }
 
 }
