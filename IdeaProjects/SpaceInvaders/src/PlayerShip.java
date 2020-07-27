@@ -3,7 +3,8 @@ public class PlayerShip extends Thread{
     private boolean moveLeft;
     private boolean moveRight;
     private boolean inGame = true;
-    private int lives = 3;
+    private boolean dead;
+    private int lives = 100;
     public void move(int direction){
         switch (direction){
             case 1:
@@ -34,6 +35,7 @@ public class PlayerShip extends Thread{
                 } else if (moveRight&& this.position<19) {
                     this.position++;
                 }
+                setDead(false);
             }
         }
         catch (InterruptedException e) {
@@ -41,13 +43,25 @@ public class PlayerShip extends Thread{
         }
     }
     public void die(){
+        setDead(true);
         this.lives--;
     }
     private void checkGameOver(){
-        if(this.lives == 0){
+        if(this.lives <= 0){
             inGame = false;
         }
     }
+    public void setDead(boolean dead){
+        this.dead = dead;
+    }
+    public int getLives() {
+        return lives;
+    }
+
+    public boolean isDead() {
+        return dead;
+    }
+
     public int[] getPosition() {
         return new int[]{this.position, 19};
     }

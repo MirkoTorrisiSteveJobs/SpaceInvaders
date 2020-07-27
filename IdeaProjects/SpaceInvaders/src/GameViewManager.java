@@ -4,6 +4,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -129,6 +130,11 @@ public class GameViewManager extends Application {
                 gc.strokeText("SCORE: " + game.getScore(), 300, 20);
                 gc.setFill(Color.WHITE);
                 gc.fillText("LEVEL " + game.getLevel(), 10, 20);
+                gc.fillText(" LIVES: " + game.getPlayer().getLives()+" ", 10, 50);
+                if(game.getPlayer().isDead()){
+                    gc.setFill(Color.RED);
+                    gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+                }
                 if(game.getPlayer().isInGame() && !game.isGameOver()){
                     animatePlayer();
                     animateEnemies();

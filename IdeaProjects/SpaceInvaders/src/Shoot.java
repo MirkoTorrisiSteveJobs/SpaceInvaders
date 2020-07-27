@@ -11,7 +11,7 @@ public class Shoot extends Thread{
 
     @Override
     public void run() {
-        while (this.coords[1] >-1 && this.coords[1] <21) {
+        while (this.coords[1] >0 && this.coords[1] <20) {
             if(!enemy) {
                 try {
                     sleep(60);
@@ -22,7 +22,7 @@ public class Shoot extends Thread{
             }
             else {
                 try {
-                    sleep(300);
+                    sleep(600);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
