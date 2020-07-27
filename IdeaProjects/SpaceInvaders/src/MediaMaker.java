@@ -79,7 +79,7 @@ public class MediaMaker {
     }
     /**
      * Metodo per muovere il background
-     * @param GAME_HEIGTH
+     * @param GAME_HEIGTH 
      * @return void
      */
     static void moveBackground(int GAME_HEIGTH){

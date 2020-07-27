@@ -19,7 +19,6 @@ public class SpaceInvaders extends Thread{
     }
     /**
      * Funzione per che inizializza un frame, richiama le altre funzioni che creano la logica del gioco
-     * @return void
      */
     protected void makeOneFrame(){
         checkGameOver();
@@ -43,7 +42,6 @@ public class SpaceInvaders extends Thread{
     }
     /**
      * Funzione per far sparare il player.
-     * @return void
      */
     public void playerShot(){
         Shoot shoot = new Shoot(false, this.player.getPosition());

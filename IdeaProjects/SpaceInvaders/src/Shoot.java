@@ -10,7 +10,6 @@ public class Shoot extends Thread{
     }
     /**
      * Metodo run della classe Shoot per avviare il Tread della classe. In questo modo il proiettile fluirà all'interno del pannello di gioco fin quanto non finirà fuori dall'arrau in cui esso è contenuto.
-     * @return void
      */
     @Override
     public void run() {
@@ -56,7 +55,6 @@ public class Shoot extends Thread{
     }
     /**
      * Metodo set, per settare true, che il proeittile ha colpito qualcosa
-     * @return void
      */
     public void setHitSomething() {
         this.hitSomething = true;

@@ -80,7 +80,6 @@ public class EnemyShip extends Thread {
     }
     /**
      * Metodo per definire che la navicella è stata colpita
-     * @return void
      */
     public void hasBeenHit() {
         this.hit = true;

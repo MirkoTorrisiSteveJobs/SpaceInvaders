@@ -21,12 +21,11 @@ public class MainMenu extends Application {
     private AnchorPane pane;
     private final int GAME_HEIGTH = 400;
     private final int GAME_WIDTH = 400;
-    private final String SCORES_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\scores.txt";
+    private final String SCORES_PATH = "\\src\\resources\\scores.txt";
     Canvas canvas = new Canvas(GAME_WIDTH, GAME_HEIGTH);
     GraphicsContext gc = canvas.getGraphicsContext2D();
     /**
      * Metodo per creare il pannello di gioco. Viene generato una nuova partita con tutti i contenuti al suo interno.
-     * @param stage
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
