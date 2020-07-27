@@ -10,7 +10,10 @@ public class Shield {
     public boolean isHit(){
         return this.isHit;
     }
-
+    /**
+     * Metodo per ottere le coordinate del posizionamento dello scudo.
+     * @return int[], indice dell'array.
+     */
     public int[] getCoords() {
         return coords;
     }

@@ -4,12 +4,13 @@ public class EnemyShip extends Thread {
     private boolean hit;
     private boolean firsTime = true;
     private boolean hasLanded;
-    private boolean isShooting;
     public EnemyShip(int type, int[] position){
         this.type = type;
         this.position = position;
     }
-
+    /**
+     * Metodo run per avviare il Thread della classe EnemyShip. In questo modo le navicelle si muoveranno in contemporanea al movimento del player
+     */
     @Override
     public void run() {
         try {
@@ -40,27 +41,47 @@ public class EnemyShip extends Thread {
             e.printStackTrace();
         }
     }
+    /**
+     * Funzione per controllare se la navicella nemica tocca il suolo(Quindi finisce il suo campo di gioco).
+     * @return void
+     */
     private void checkIfLanded(){
         if(this.position[1] == 19){
             hasLanded = true;
         }
     }
-
+    /**
+     * Funzione per controllare se la navicella nemica è atterrata.
+     * @return bool
+     */
     public boolean isLanded() {
         return hasLanded;
     }
-
+    /**
+     * Funzione get per ottenere la posizione della navicella nemica.
+     * @return int[], indice dell'array.
+     */
     public int[] getPosition() {
         return position;
     }
-
+    /**
+     * Metodo get per ottenere il tipo di navicella nemica.
+     * @return int, indica il tipo di navicella
+     */
     public int getType() {
         return type;
     }
-
+    /**
+     * Metodo per controllare se la navicella è  colpita.
+     * @return bool
+     */
     public boolean isHit() {
         return hit;
     }
+    /**
+     * Metodo per definire che la navicella è stata colpita
+     * @return void
+     */
     public void hasBeenHit() {
         this.hit = true;
     }

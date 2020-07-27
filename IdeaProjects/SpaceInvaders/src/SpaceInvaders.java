@@ -17,7 +17,10 @@ public class SpaceInvaders extends Thread{
         this.player.start();
         this.playerName = playerName;
     }
-
+    /**
+     * Funzione per che inizializza un frame, richiama le altre funzioni che creano la logica del gioco
+     * @return void
+     */
     protected void makeOneFrame(){
         checkGameOver();
         checkWin();
@@ -25,6 +28,10 @@ public class SpaceInvaders extends Thread{
         removeShots();
         randomEnemyShot();
     }
+    /**
+     * Funzione per far sparare in maniera random un nemico.Eseguirà un controllo tra tutti i nemici e tramite l'utilizzo del Math.Random sceglie a caso il nemico che sparerà
+     * @return void
+     */
     private void randomEnemyShot(){
         for(EnemyShip enemyShip:enemies){
             if(Math.random() <0.00001*this.level  && !enemyShip.isHit()){
@@ -34,11 +41,19 @@ public class SpaceInvaders extends Thread{
             }
         }
     }
+    /**
+     * Funzione per far sparare il player.
+     * @return void
+     */
     public void playerShot(){
         Shoot shoot = new Shoot(false, this.player.getPosition());
         SpaceInvaders.shootsContainer.add(shoot);
         shoot.start();
     }
+    /**
+     * Funzione per calcolare se il player ha vinto la partita.Viene effettuato un controllo sul numero di nemici uccisi.Qualora il numero di nemici uccisi è uguale alla dimensione del contenitore dei nemici oppure il punteggio è di 250, il player vince la partita
+     * @return void
+     */
     private void checkWin(){
         int count = 0;
         for(EnemyShip ship:enemies){
@@ -51,6 +66,10 @@ public class SpaceInvaders extends Thread{
             loadEnemies(this.level);
         }
     }
+    /**
+     * Funzione per controllare se la partita deve finire. Se il giocatore non è in partita allora il gioco finisce.
+     * @return void
+     */
     private void checkGameOver(){
         if(!player.isInGame()){
             gameOver=true;
@@ -61,6 +80,10 @@ public class SpaceInvaders extends Thread{
             }
         }
     }
+    /**
+     * Funzione per caricare gli scudi. Tramite un ciclo for sono caricati gli scudi.
+     * @return void
+     */
     private void loadShields(){
         for (int i = 1; i < 17; i+=5) {
             shieldCoords.add(new Shield(new int[]{i,18}));
@@ -68,7 +91,10 @@ public class SpaceInvaders extends Thread{
             shieldCoords.add(new Shield(new int[]{i+2,18}));
         }
     }
-
+    /**
+     * Funzione per controllare se lo sparo ha colpito il giocatore, gli scudi o i nemici. Viene effettuato un controllo all'interno dell'arrayList shootsContainer. Se lo sparo si trova nella stessa posizione del player, quest'ultimo perde una vita. Mentre  lo sparo coincide con la posizione del nemico quest'ultimo viene colpito e distrutto generando un suono.
+     * @return void
+     */
     private void checkShoots(){
         for(Shoot shoot: shootsContainer){
             if(shoot.isEnemy()) {
@@ -103,7 +129,10 @@ public class SpaceInvaders extends Thread{
             }
         }
     }
-
+    /**
+     * Funzione per rimuovere lo sparo dopo che ha superato l'intera colonna di nemici.
+     * @return void
+     */
     private void removeShots(){
         Iterator<Shoot> iter = shootsContainer.iterator();
 
@@ -113,7 +142,10 @@ public class SpaceInvaders extends Thread{
                 iter.remove();
         }
     }
-
+    /**
+     * Funzione per caricare i nemici in base al livello.
+     * @param level
+     */
     private void loadEnemies(int level){
         for(int i = 1; i < level+5;i++) {
             for (int j = 5; j < 15; j++) {

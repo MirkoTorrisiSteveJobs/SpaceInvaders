@@ -4,7 +4,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -65,9 +64,17 @@ public class GameViewManager extends Application {
         createContent(stage);
 
     }
+    /**
+     * Metodo per animare lo sprite del giocatore
+     * @return void
+     */
     private void animatePlayer(){
         gc.drawImage(playerShip, game.getPlayer().getPosition()[0] * multiplier, game.getPlayer().getPosition()[1] * multiplier - 5);
     }
+    /**
+     * Metodo per animare lo sprite dei nemici
+     * @return void
+     */
     private void animateEnemies(){
         for (int i = 0; i < game.getEnemies().size();i++) {
             if(!game.getEnemies().get(i).isHit()) {
@@ -85,6 +92,10 @@ public class GameViewManager extends Application {
             }
         }
     }
+    /**
+     * Metodo per animare lo sprite dello sparo
+     * @return void
+     */
     private void animateShoots(){
         for (Shoot shoot : game.getShoots()) {
             if(!shoot.isHitSomething()) {
@@ -95,6 +106,10 @@ public class GameViewManager extends Application {
             }
         }
     }
+    /**
+     * Metodo per animare lo sprite degli scudi
+     * @return void
+     */
     private void animateShields(){
         for (Shield shield : game.getShieldCoords()) {
             if (!shield.isHit()) {
@@ -102,7 +117,13 @@ public class GameViewManager extends Application {
             }
         }
     }
-
+    /**
+     * Metodo per creare il contenuto del gioco. Inizializza il mediaplayer con la musica, il pannello dove vengono inseriti tutti gli oggetti
+     * contiene l'animator che aggiorna il frame, richiamando la logica del gioco della classe di modello con il suo metodo "MakeOneFrame",
+     * gestisce l'input dei tasti, restituisce gameOver se la partita finisce
+     * @param stage
+     * @return Scene
+     */
     private Scene createContent(Stage stage) {
         MediaPlayer player = MediaMaker.playSong();
         player.play();
@@ -164,6 +185,11 @@ public class GameViewManager extends Application {
         stage.show();
         return scene;
     }
+    /**
+     * Metodo per gestire l'input da tastiera, cambia comportamento a seconda dello status della partita(GameOver)
+     * @param arg0
+     * @return void
+     */
     private void handle(KeyEvent arg0) {
         if(!game.isGameOver()) {
             if (arg0.getCode() == KeyCode.SPACE) {

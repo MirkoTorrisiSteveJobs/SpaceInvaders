@@ -24,12 +24,19 @@ public class MainMenu extends Application {
     private final String SCORES_PATH = "\\IdeaProjects\\SpaceInvaders\\src\\resources\\scores.txt";
     Canvas canvas = new Canvas(GAME_WIDTH, GAME_HEIGTH);
     GraphicsContext gc = canvas.getGraphicsContext2D();
-
+    /**
+     * Metodo per creare il pannello di gioco. Viene generato una nuova partita con tutti i contenuti al suo interno.
+     * @param stage
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("SpaceInvaders");
         createContent(primaryStage);
     }
+    /**
+     * Metodo per creare il contenuto del menu. Il button new Game inizializza una nuova partita, il metodo get best scores restituisce i punteggi migliori, salvati su file csv.
+     * @param stage
+     */
     private void createContent(Stage stage){
         pane = new AnchorPane();
         MediaMaker.createBackground(pane, GAME_HEIGTH);
@@ -78,6 +85,7 @@ public class MainMenu extends Application {
         hb.setLayoutY(200);
         startBtn.setOnAction(e->{
             try {
+                /** se il playername non viene inserito nel field, la partita non inizia*/
                 if(textField.getText()!= null && !textField.getText().isEmpty()) {
                     game = new GameViewManager(textField.getText());
                     game.start(stage);
